@@ -1,10 +1,9 @@
+# app_fastapi_ollama.py
 from PyPDF2 import PdfReader
-from langchain_community.llms import OllamaLLM
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
-from langchain.chains.question_answering import load_qa_chain
-from langchain.chains import ConversationalRetrievalChain
+from langchain_community.llms.ollama import Ollama
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
 import pickle
 from pathlib import Path
 from dotenv import load_dotenv
@@ -44,30 +43,28 @@ load_dotenv()
 
 # 初始化Ollama模型
 def init_ollama_model(
-        self, 
-        model: str = "gpt-oss:20b"#"deepseek-r1:7b",
+        model: str = "gpt-oss:20b", #"deepseek-r1:7b",
         base_url: str = "http://localhost:11434",
         **kwargs
-    ) -> OllamaLLM:
-        """初始化OllamaLLM模型
-        
+    ) -> Ollama:
+        """初始化Ollama模型
+
         Args:
             model: Ollama模型名稱
             base_url: Ollama服務URL
             **kwargs: 額外的模型參數
-            
+
         Returns:
-            初始化後的OllamaLLM實例
+            初始化後的Ollama實例
         """
         try:
-            return OllamaLLM(
+            return Ollama(
                 model=model,
                 base_url=base_url,
-                streaming=True,
                 **kwargs
             )
         except Exception as e:
-            logger.error(f"OllamaLLM模型初始化失敗: {str(e)}")
+            logger.error(f"Ollama模型初始化失敗: {str(e)}")
             raise
 
 # 初始化嵌入模型
@@ -109,11 +106,34 @@ async def get_doc_embeds(file_content, filename):
 async def conversational_chat(query, filename, history):
     if filename not in qa_chains:
         return {"error": "請先上傳PDF文件"}
-    
-    qa = qa_chains[filename]
-    result = qa({"question": query, "chat_history": history})
-    history.append((query, result["answer"]))
-    return {"answer": result["answer"], "history": history}
+
+    chain_data = qa_chains[filename]
+    llm = chain_data["llm"]
+    retriever = chain_data["retriever"]
+
+    # 檢索相關文檔
+    docs = retriever.get_relevant_documents(query)
+    context = "\n\n".join([doc.page_content for doc in docs])
+
+    # 構建包含歷史的提示
+    history_text = "\n".join([f"Human: {q}\nAssistant: {a}" for q, a in history])
+
+    # 生成回答
+    prompt = f"""根據以下上下文回答問題。如果上下文中沒有相關信息,請說明你不知道。
+
+歷史對話:
+{history_text}
+
+上下文:
+{context}
+
+問題: {query}
+
+回答:"""
+
+    answer = llm.invoke(prompt)
+    history.append((query, answer))
+    return {"answer": answer, "history": history}
 
 @app.get("/")
 async def read_root(request: Request):
@@ -124,17 +144,17 @@ async def upload_pdf(file: UploadFile = File(...)):
     try:
         file_content = await file.read()
         vectors = await get_doc_embeds(io.BytesIO(file_content), file.filename)
-        
+
         # 使用Ollama模型替代ChatOpenAI
-        llm = init_ollama_model(None)
-        qa = ConversationalRetrievalChain.from_llm(
-            llm, 
-            retriever=vectors.as_retriever(), 
-            return_source_documents=True
-        )
-        
-        qa_chains[file.filename] = qa
-        
+        llm = init_ollama_model()
+        retriever = vectors.as_retriever()
+
+        # 儲存 LLM 和 retriever
+        qa_chains[file.filename] = {
+            "llm": llm,
+            "retriever": retriever
+        }
+
         return JSONResponse(content={"status": "success", "filename": file.filename})
     except Exception as e:
         logger.error(f"上傳PDF時出錯: {str(e)}")
@@ -158,4 +178,4 @@ async def chat(
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app_fastapi_ollama:app", host="0.0.0.0", port=8000, reload=True)
