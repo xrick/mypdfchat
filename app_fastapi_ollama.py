@@ -45,7 +45,7 @@ load_dotenv()
 # 初始化Ollama模型
 def init_ollama_model(
         self, 
-        model: str = "deepseek-r1:7b",
+        model: str = "gpt-oss:20b"#"deepseek-r1:7b",
         base_url: str = "http://localhost:11434",
         **kwargs
     ) -> OllamaLLM:
