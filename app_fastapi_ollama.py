@@ -1,7 +1,13 @@
 # app_fastapi_ollama.py
 from PyPDF2 import PdfReader
 from langchain_community.llms.ollama import Ollama
-from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+try:
+    # Preferred import (newer package)
+    from langchain_huggingface import HuggingFaceEmbeddings  # type: ignore
+except Exception:  # fallback to community for older envs
+    from langchain_community.embeddings.huggingface import (  # type: ignore
+        HuggingFaceEmbeddings,
+    )
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 import pickle
@@ -34,9 +40,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 設置靜態文件和模板
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# 設置靜態文件和模板（使用與此文件同層的相對路徑）
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+TEMPLATE_DIR = BASE_DIR / "templates"
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 # 加載環境變量
 load_dotenv()
@@ -67,16 +76,58 @@ def init_ollama_model(
             logger.error(f"Ollama模型初始化失敗: {str(e)}")
             raise
 
-# 初始化嵌入模型
-embedding_path = "/home/mapleleaf/LCJRepos/Embedding_Models/jina-embeddings-v2-base-zh"
-model_name = embedding_path
-model_kwargs = {'device': 'cpu'}
-encode_kwargs = {'normalize_embeddings': False}
-hf = HuggingFaceEmbeddings(
-    model_name=model_name,
-    model_kwargs=model_kwargs,
-    encode_kwargs=encode_kwargs
-)
+# 嵌入模型初始化說明（僅供閱讀，避免被 Streamlit Magic 輸出）
+# 預設使用較小且常用的模型（英文通用）：all-MiniLM-L6-v2
+# 若載入失敗，將嘗試備援（中文向量模型）：jinaai/jina-embeddings-v2-base-zh
+# 可用環境變數指定本地路徑或其他模型ID：
+#   export EMBEDDING_MODEL=/path/to/local/model
+# 或
+#   export EMBEDDING_MODEL=all-MiniLM-L6-v2
+embedding_model_env = os.getenv("EMBEDDING_MODEL")
+fallback_model_env = os.getenv("EMBEDDING_FALLBACK")
+# 預設使用較小且普及的模型，降低逾時風險。
+model_name = (embedding_model_env or "all-MiniLM-L6-v2").strip()
+fallback_model = (fallback_model_env or "jinaai/jina-embeddings-v2-base-zh").strip()
+
+model_kwargs = {"device": "cpu"}
+encode_kwargs = {"normalize_embeddings": False}
+
+_hf_embedder = None  # lazy singleton
+
+def _init_embeddings(name: str):
+    logger.info(f"Using embedding model: {name}")
+    return HuggingFaceEmbeddings(
+        model_name=name,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs,
+    )
+
+def get_embedder():
+    global _hf_embedder
+    if _hf_embedder is not None:
+        return _hf_embedder
+    try:
+        _hf_embedder = _init_embeddings(model_name)
+    except Exception as e:
+        logger.warning(
+            "Failed to load embedding model '%s': %s. Trying fallback '%s'...",
+            model_name,
+            str(e),
+            fallback_model,
+        )
+        try:
+            _hf_embedder = _init_embeddings(fallback_model)
+        except Exception as e2:
+            logger.error(
+                "Failed to load fallback embedding model '%s': %s",
+                fallback_model,
+                str(e2),
+            )
+            raise RuntimeError(
+                "Could not load embedding models. Set EMBEDDING_MODEL to a local path "
+                "or ensure network access to Hugging Face Hub."
+            ) from e2
+    return _hf_embedder
 
 # 全局變量
 vectors_store = {}
@@ -89,8 +140,8 @@ async def store_doc_embeds(file_content, filename):
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     chunks = splitter.split_text(corpus)
     
-    # 使用HuggingFace嵌入替代OpenAI嵌入
-    vectors = FAISS.from_texts(chunks, hf)
+    # 使用HuggingFace嵌入替代OpenAI嵌入（延遲初始化嵌入器）
+    vectors = FAISS.from_texts(chunks, get_embedder())
     
     # 保存向量存儲
     vectors_store[filename] = vectors
@@ -178,4 +229,12 @@ async def chat(
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
 
 if __name__ == "__main__":
-    uvicorn.run("app_fastapi_ollama:app", host="0.0.0.0", port=8000, reload=True)
+    # 直接以 Python 執行本檔時，只有在顯式同意的情況下才啟動 Uvicorn，避免在非主執行緒（例如被 Streamlit 誤執行）發生 signal 錯誤。
+    if os.getenv("RUN_UVICORN") == "1":
+        port = int(os.getenv("PORT", "8000"))
+        reload = os.getenv("UVICORN_RELOAD", "1") in {"1", "true", "True"}
+        uvicorn.run("app_fastapi_ollama:app", host="0.0.0.0", port=port, reload=reload)
+    else:
+        logger.warning(
+            "此檔案為 FastAPI 應用，請使用：uvicorn app_fastapi_ollama:app --reload"
+        )

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PDF Chat API</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>PDF Chat API</h1>
+      <section>
+        <h2>1) Upload PDF</h2>
+        <form id="uploadForm">
+          <input type="file" id="pdf" name="file" accept="application/pdf" required />
+          <button type="submit">Upload</button>
+        </form>
+        <p id="uploadStatus"></p>
+      </section>
+
+      <section>
+        <h2>2) Chat</h2>
+        <form id="chatForm">
+          <input type="text" id="filename" name="filename" placeholder="Uploaded filename.pdf" required />
+          <input type="text" id="query" name="query" placeholder="Ask something about the PDF" required />
+          <input type="hidden" id="history" name="history" value="[]" />
+          <button type="submit">Send</button>
+        </form>
+        <div id="chatOutput" class="chat"></div>
+      </section>
+    </main>
+    <script>
+      const uploadForm = document.getElementById('uploadForm');
+      const uploadStatus = document.getElementById('uploadStatus');
+      const chatForm = document.getElementById('chatForm');
+      const chatOutput = document.getElementById('chatOutput');
+
+      uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData();
+        const fileInput = document.getElementById('pdf');
+        if (!fileInput.files.length) return;
+        fd.append('file', fileInput.files[0]);
+        uploadStatus.textContent = 'Uploading...';
+        const r = await fetch('/upload-pdf/', { method: 'POST', body: fd });
+        const data = await r.json();
+        uploadStatus.textContent = JSON.stringify(data);
+        if (data.filename) {
+          document.getElementById('filename').value = data.filename;
+        }
+      });
+
+      chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(chatForm);
+        const r = await fetch('/chat/', { method: 'POST', body: fd });
+        const data = await r.json();
+        const p = document.createElement('pre');
+        p.textContent = JSON.stringify(data, null, 2);
+        chatOutput.appendChild(p);
+        // Update history hidden field if provided
+        if (data.history) {
+          document.getElementById('history').value = JSON.stringify(data.history);
+        }
+      });
+    </script>
+  </body>
+  </html>
+
