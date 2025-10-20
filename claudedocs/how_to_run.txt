@@ -20,5 +20,5 @@ There are two entry points in this repo:
    the `static/` and `templates/` folders already included.
 
 2) Streamlit UI example
-   - Original app: streamlit run app_fastapi_ollama.py
+   - Original app: streamlit run app.py
    - Custom component demo: streamlit run streamlit_components/demo_app.py
