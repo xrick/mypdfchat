@@ -1,6 +1,18 @@
+# LangChain stack - CRITICAL: Keep versions compatible
 langchain==0.1.13
+langchain-core>=0.1.33,<0.2.0  # Must be <0.2 for pydantic_v1 compatibility
+langchain-community==0.0.29
+langchain-huggingface==0.0.2  # 0.0.9+ requires newer langchain-core
+langchain-text-splitters<0.1
+
+# UI Frameworks
 streamlit==1.32.2
-chromadb==0.4.24
+
+# Vector Store
+faiss-cpu==1.12.0  # Required for FAISS vector similarity search
+chromadb==0.4.24  # (Note: Unused - FAISS is used instead)
+
+# PDF Processing
 pypdf==4.1.0
 
 # FastAPI stack
@@ -11,5 +23,4 @@ python-multipart>=0.0.9
 
 # Embeddings
 sentence-transformers>=2.5
-langchain-huggingface>=0.0.9
 huggingface_hub>=0.24

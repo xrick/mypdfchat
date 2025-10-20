@@ -40,7 +40,7 @@ model_name = "all-MiniLM-L6-v2".strip()
 _hf_embedder = None  # lazy singleton
 async def main():
     
-    async def init_ollama_model(
+    def init_ollama_model(
         model: str = "gpt-oss:20b", #"deepseek-r1:7b",
         base_url: str = "http://localhost:11434",
         **kwargs
@@ -66,14 +66,15 @@ async def main():
             raise
     
     
-    async def _init_embeddings(name: str):
+    def _init_embeddings(name: str):
         logger.info(f"Using embedding model: {name}")
         return HuggingFaceEmbeddings(
             model_name="all-MiniLM-L6-v2",
             model_kwargs=model_kwargs,
             encode_kwargs=encode_kwargs,
         )
-    async def get_embedder():
+
+    def get_embedder():
         global _hf_embedder
         if _hf_embedder is not None:
             return _hf_embedder
@@ -94,10 +95,10 @@ async def main():
             #         fallback_model,
             #         str(e2),
             #     )
-                raise RuntimeError(
-                    "Could not load embedding models. Set EMBEDDING_MODEL to a local path "
-                    "or ensure network access to Hugging Face Hub."
-                ) from e
+            raise RuntimeError(
+                "Could not load embedding models. Set EMBEDDING_MODEL to a local path "
+                "or ensure network access to Hugging Face Hub."
+            ) from e
         return _hf_embedder
 
     async def storeDocEmbeds(file, filename):
@@ -158,7 +159,7 @@ async def main():
             file = uploaded_file.read()
             # pdf = PyPDF2.PdfFileReader()
             vectors = await getDocEmbeds(io.BytesIO(file), uploaded_file.name)
-            qa = ConversationalRetrievalChain.from_llm(ChatOpenAI(model_name="gpt-3.5-turbo"), retriever=vectors.as_retriever(), return_source_documents=True)
+            qa = ConversationalRetrievalChain.from_llm(llm, retriever=vectors.as_retriever(), return_source_documents=True)
 
         st.session_state['ready'] = True
 
