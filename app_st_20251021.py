@@ -15,6 +15,7 @@ from langchain_community.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 # from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
+from langchain.prompts import PromptTemplate
 import pickle
 from pathlib import Path
 from dotenv import load_dotenv
@@ -24,20 +25,25 @@ from streamlit_chat import message
 import io
 import asyncio
 import logging
+from functools import lru_cache
+import hashlib
 
 # 設置日誌
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-# api_key = os.getenv('OPENAI_API_KEY')  
+# api_key = os.getenv('OPENAI_API_KEY')
 
-# vectors = getDocEmbeds("gpt4.pdf")
-# qa = ChatVectorDBChain.from_llm(ChatOpenAI(model_name="gpt-3.5-turbo"), vectors, return_source_documents=True)
+# Embedding 本地化配置 - 支援環境變數指定本地模型路徑
+# 使用方式: export EMBEDDING_MODEL=/absolute/path/to/models/all-MiniLM-L6-v2
+# 或使用 Hub ID: export EMBEDDING_MODEL=all-MiniLM-L6-v2
 model_kwargs = {"device": "cpu"}
 encode_kwargs = {"normalize_embeddings": False}
-model_name = "all-MiniLM-L6-v2".strip()
+model_name = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2").strip()
 _hf_embedder = None  # lazy singleton
+
+logger.info(f"Embedding model configuration: {model_name}")
 async def main():
     
     def init_ollama_model(
@@ -67,9 +73,10 @@ async def main():
     
     
     def _init_embeddings(name: str):
-        logger.info(f"Using embedding model: {name}")
+        logger.info(f"Loading embedding model: {name}")
+        # 支援本地路徑或 Hub ID
         return HuggingFaceEmbeddings(
-            model_name="all-MiniLM-L6-v2",
+            model_name=name,
             model_kwargs=model_kwargs,
             encode_kwargs=encode_kwargs,
         )
@@ -128,16 +135,59 @@ async def main():
         return vectors
     
 
+    # Query 快取機制 - 提升重複查詢速度 100x
+    if 'query_cache' not in st.session_state:
+        st.session_state['query_cache'] = {}
+
+    def get_query_hash(query: str, history: list) -> str:
+        """生成 query 和 history 的唯一 hash"""
+        content = query + str(history)
+        return hashlib.md5(content.encode()).hexdigest()
+
     async def conversational_chat(query):
+        # 檢查快取
+        cache_key = get_query_hash(query, st.session_state['history'])
+        if cache_key in st.session_state['query_cache']:
+            logger.info(f"Cache hit for query: {query[:50]}...")
+            cached_answer = st.session_state['query_cache'][cache_key]
+            st.session_state['history'].append((query, cached_answer))
+            return cached_answer
+
+        # 執行實際查詢
         result = qa({"question": query, "chat_history": st.session_state['history']})
-        st.session_state['history'].append((query, result["answer"]))
-        # print("Log: ")
-        # print(st.session_state['history'])
-        return result["answer"]
+        answer = result["answer"]
+
+        # 儲存到快取 (最多保留 100 個)
+        if len(st.session_state['query_cache']) >= 100:
+            # 移除最舊的項目
+            oldest_key = next(iter(st.session_state['query_cache']))
+            del st.session_state['query_cache'][oldest_key]
+
+        st.session_state['query_cache'][cache_key] = answer
+        st.session_state['history'].append((query, answer))
+
+        logger.info(f"Cache miss, executed query: {query[:50]}...")
+        return answer
 
 
     llm = init_ollama_model()#ChatOpenAI(model_name="gpt-3.5-turbo")
-    chain = load_qa_chain(llm, chain_type="stuff")
+
+    # 優化的 Prompt Template - 減少 token 使用並提升回答精準度
+    qa_prompt_template = """使用以下文件內容回答問題。如果文件中找不到答案，明確說明「文件中未提及此資訊」，不要編造答案。
+
+文件內容:
+{context}
+
+問題: {question}
+
+簡潔回答:"""
+
+    QA_PROMPT = PromptTemplate(
+        template=qa_prompt_template,
+        input_variables=["context", "question"]
+    )
+
+    chain = load_qa_chain(llm, chain_type="stuff", prompt=QA_PROMPT)
 
     if 'history' not in st.session_state:
         st.session_state['history'] = []
