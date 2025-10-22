@@ -1,14 +1,14 @@
-Project Description:
-This is a
+# Project Description:
+This is a LLM RAG Web Application
 
 
 Awesome—let’s shape your architecture around those three layers and the concrete services you listed. Below is a crisp, production-oriented blueprint with interfaces, data contracts, flow, and a runnable-ish skeleton you can drop into a repo.
 
 ---
 
-# Layered Architecture (LLM Provider → Services → Presentation)
+## Layered Architecture (LLM Provider → Services → Presentation)
 
-## 0) Overall dependency rule
+### 0) Overall dependency rule
 
 * **Presentation → Services → LLM Provider**
 * No inward dependency reversal (keep the core clean; use interfaces).
@@ -26,18 +26,18 @@ app/
 
 ---
 
-## 1) LLM Provider Layer
+### 1) LLM Provider Layer
 
-### Goals
+#### Goals
 
 * One **OpenAI-compatible** client interface.
 * Adapters for **Ollama**, **vLLM**, **llama.cpp** (and OpenAI/Anthropic later).
 * Support: chat, streaming, tool-calls (optional), retries, timeouts.
 
-### Core interface
+#### Core interface
 
 ```python
-# llm_providers/base.py
+#llm_providers/base.py
 from typing import Iterable, List, Optional, Dict, Any
 from pydantic import BaseModel
 
@@ -67,7 +67,7 @@ class LLMClient:
     def stream(self, req: ChatRequest) -> Iterable[ChatChunk]: ...
 ```
 
-### OpenAI-compatible client + adapters
+#### OpenAI-compatible client + adapters
 
 ```python
 # llm_providers/openai_compat.py
