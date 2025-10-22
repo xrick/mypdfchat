@@ -1,5 +1,5 @@
 # Project Description:
-This is a LLM RAG Web Application
+This is a LLM RAG Web Application which enable users to chat, query, and ask the documents you uploaded. It adopts
 
 
 Awesome—let’s shape your architecture around those three layers and the concrete services you listed. Below is a crisp, production-oriented blueprint with interfaces, data contracts, flow, and a runnable-ish skeleton you can drop into a repo.
