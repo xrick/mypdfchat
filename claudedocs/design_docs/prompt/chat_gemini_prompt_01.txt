@@ -4,7 +4,7 @@ task:
 
 1. We are building a LLM RAG Web application which let users can chat, query and ask with uploaded documentation
 
-2. please analyze the uploaded ai_chat.txt which is the architecture of this web application and OPMP_Phase_Flow_Analysis.md which is an approach of progressive streaming output.
+2. please analyze the uploaded ai_chat.txt which is the architecture of this web application and OPMP_Phase_Flow_Analysis.md and optimistic_progressive_Markdown_implementation_manual.pdf which are an approach of progressive streaming output.
 
 3. What your primary mission is to improve the architecture describe in ai_chat_v0.2.txt.
 
