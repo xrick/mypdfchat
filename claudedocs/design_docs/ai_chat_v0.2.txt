@@ -1,5 +1,27 @@
 System Role: You are an experienced and profound architect
-
+implementation third library: langchain, langgraph, 
 task:
 
-1. analyze the uploaded md file:
+1. analyze the uploaded md file:ai_chat_v0.2.txt
+2. the architecture contains three layers:
+	- Foundmental Layer
+	- Services Layer
+	- Presentation Layer
+3. the project structure is as following:
+	app/
+	 ├─ presentation/           # HTTP streaming, UIs, adapters for OPMP & exports
+	 ├─ services/               # business/application services (pure python where possible)
+	 ├─ llm_providers/          # provider adapters (OpenAI-compatible)
+	 ├─ retrieval_providers/    # Milvus/FAISS/DuckDB adapters (optional, via interfaces)
+	 ├─ domain/                 # Pydantic models, state enums, DTOs, errors
+	 ├─ infra/                  # logging, config, caching, queues
+	 └─ main.py                 # FastAPI/ASGI entry
+4. This architecture must be a state-driven web application.
+5. Currently, the detailed files of Services Layer are as following:
+	#### Domain models & state
+	- domain/models.py
+	#### CoreLogicService
+	- services/core_logic.py
+	#### InputDataHandleService
+	- services/input_data_service.py
+	#### PromptService
