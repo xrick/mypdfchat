@@ -1,5 +1,5 @@
-# Project Description:
-This is a LLM RAG Web Application which enable users to chat, query, and ask the documents you uploaded. 
+# DocAI Project Description:
+DocAI is a LLM RAG Web Application which enable users to chat, query, and ask the documents you uploaded. 
 It adopts
 
 
