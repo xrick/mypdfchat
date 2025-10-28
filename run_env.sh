@@ -1,1 +1,0 @@
-source .chatenv/bin/activate

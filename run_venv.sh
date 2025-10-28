@@ -1,1 +1,0 @@
-source .docchatenv/bin/activate
