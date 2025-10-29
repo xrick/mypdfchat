@@ -5,6 +5,7 @@ All data validation and serialization models for the DocAI RAG application.
 """
 
 from typing import List, Optional, Dict, Any
+from enum import Enum
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime, timezone
 
@@ -232,7 +233,7 @@ class SessionListResponse(BaseModel):
 # Export Endpoint Schemas
 # =============================================================================
 
-class ExportFormat(str):
+class ExportFormat(str, Enum):
     """Supported export formats"""
     JSON = "json"
     CSV = "csv"

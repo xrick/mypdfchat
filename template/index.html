@@ -6,7 +6,10 @@
     <title>DocAI 應用程式原型</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
+
+    <!-- Markdown Rendering -->
+    <script src="/static/js/marked.min.js"></script>
+
     <style>
         /* CSS 變數：便於管理顏色和尺寸 */
         :root {
@@ -406,6 +409,8 @@
         </div>
     </dialog>
 
+    <!-- DocAI Client Library -->
+    <script src="/static/js/docai-client.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -464,38 +469,39 @@
             // --- 4. 核心：上傳和即時反饋流程 ---
             // 實現您描述的第 3、4、5 步
             
-            confirmUploadBtn.addEventListener('click', () => {
-                // 為了演示，我們使用一個假的文件名
-                const fakeFileName = "New_Upload_" + Math.floor(Math.random() * 1000) + ".pdf";
+            confirmUploadBtn.addEventListener('click', async () => {
+                // Get selected file
+                const files = fileInput.files;
+                if (!files || files.length === 0) {
+                    alert('請選擇一個 PDF 檔案');
+                    return;
+                }
+
+                const file = files[0];
 
                 // **第 3 步: 立即關閉模態框**
                 uploadModal.close();
 
                 // **第 4 步: 立即在側邊欄添加帶有 "spinner" 的項目**
-                const newItem = document.createElement('li');
-                newItem.className = 'source-item';
-                newItem.innerHTML = `
-                    <i class="fa-solid fa-file-pdf file-icon" style="color: #e63946;"></i>
-                    <span class="file-name">${fakeFileName}</span>
-                    <div class="spinner"></div> `;
-                
-                // 將新項目添加到列表的頂部
-                sourceList.prepend(newItem);
+                const newItem = window.docaiClient.addFileToUI(file.name);
 
-                // **第 5 步: 模擬後端處理**
-                // 3 秒後，將 spinner 替換為 checkbox
-                setTimeout(() => {
-                    const spinner = newItem.querySelector('.spinner');
-                    
-                    if (spinner) {
-                        const checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.checked = true; // 預設選中
-                        
-                        // **關鍵: 用複選框替換旋轉圓圈**
-                        spinner.replaceWith(checkbox);
-                    }
-                }, 3000); // 模擬 3 秒的處理時間
+                // **第 5 步: 真實後端處理**
+                try {
+                    const result = await window.docaiClient.uploadFile(file);
+
+                    // 上傳成功，將 spinner 替換為 checkbox
+                    window.docaiClient.updateFileStatus(newItem, 'completed', result.file_id);
+
+                    console.log('Upload completed:', result);
+                } catch (error) {
+                    // 上傳失敗，顯示錯誤
+                    window.docaiClient.updateFileStatus(newItem, 'error');
+                    console.error('Upload failed:', error);
+                    alert('上傳失敗：' + error.message);
+                }
+
+                // 清空 file input
+                fileInput.value = '';
             });
             
             // 處理拖放 (可選的加分項)
