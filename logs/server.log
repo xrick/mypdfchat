@@ -1,0 +1,196 @@
+INFO:     Will watch for changes in these directories: ['/home/mapleleaf/LCJRepos/gitprjs/DocAI']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [649646] using WatchFiles
+2025-10-30 18:17:39,410 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/start_system.sh')}
+INFO:     Started server process [649680]
+INFO:     Waiting for application startup.
+L Failed to initialize database: threads can only be started once
+INFO:     Application startup complete.
+2025-10-30 18:17:39,761 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:40,112 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+INFO:     127.0.0.1:44524 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44528 - "GET / HTTP/1.1" 200 OK
+2025-10-30 18:17:40,462 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:40,813 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:41,163 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:41,514 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:41,864 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:42,215 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:42,565 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:42,916 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:43,267 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:43,617 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:43,968 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:44,318 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:44,669 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:45,019 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:45,370 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:45,721 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:46,071 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:46,422 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:46,772 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:47,123 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:47,473 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:47,824 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:48,174 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:48,525 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:48,875 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:49,226 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:49,577 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:49,928 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:50,278 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:50,629 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:50,980 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:51,330 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:51,681 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:52,031 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:52,381 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:52,732 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:53,083 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:53,434 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:53,784 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:54,135 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:54,485 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:54,836 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:55,186 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:55,537 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:55,887 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:56,238 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:56,588 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:56,939 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:57,289 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:57,639 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:57,990 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:58,341 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:58,691 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:59,042 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:59,392 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:17:59,743 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:00,094 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:00,444 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:00,795 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:01,145 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:01,496 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:01,846 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:02,197 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:02,547 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:02,898 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:03,248 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:03,599 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:03,949 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:04,300 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:04,650 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:05,001 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:05,351 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:05,702 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:06,052 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:06,403 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+INFO:     127.0.0.1:40052 - "POST /api/v1/upload HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/uvicorn/protocols/http/httptools_impl.py", line 419, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/applications.py", line 123, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/middleware/cors.py", line 83, in __call__
+    await self.app(scope, receive, send)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/routing.py", line 762, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/routing.py", line 782, in app
+    await route.handle(scope, receive, send)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/routing.py", line 297, in handle
+    await self.app(scope, receive, send)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/routing.py", line 77, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 64, in wrapped_app
+    raise exc
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/starlette/routing.py", line 72, in app
+    response = await func(request)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/fastapi/routing.py", line 285, in app
+    raise e
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/fastapi/routing.py", line 275, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/fastapi/dependencies/utils.py", line 598, in solve_dependencies
+    solved = await call(**sub_values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/app/Providers/file_metadata_provider/client.py", line 472, in get_file_metadata_provider
+    await _file_metadata_provider_instance.initialize_database()
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/app/Providers/file_metadata_provider/client.py", line 66, in initialize_database
+    async with await self._get_connection() as conn:
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/aiosqlite/core.py", line 154, in __aenter__
+    return await self
+           ^^^^^^^^^^
+  File "/home/mapleleaf/LCJRepos/gitprjs/DocAI/docaienv/lib/python3.11/site-packages/aiosqlite/core.py", line 150, in __await__
+    self.start()
+  File "/home/mapleleaf/.local/share/uv/python/cpython-3.11.6-linux-x86_64-gnu/lib/python3.11/threading.py", line 959, in start
+    raise RuntimeError("threads can only be started once")
+RuntimeError: threads can only be started once
+2025-10-30 18:18:06,753 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:07,104 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:07,454 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:07,805 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:08,156 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:08,506 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:08,857 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:09,207 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:09,558 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:09,908 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:10,259 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:10,610 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:10,960 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:11,311 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:11,661 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:12,012 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:12,362 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:12,713 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:13,063 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:13,414 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:13,764 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:14,115 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:14,465 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:14,816 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:15,166 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:15,517 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:15,868 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:16,219 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:16,569 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:16,920 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:17,270 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:17,621 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:17,971 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:18,322 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:18,672 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:19,022 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:19,373 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:19,723 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:20,074 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:20,424 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:20,775 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:21,125 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:21,476 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:21,826 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:22,177 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:22,527 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:22,878 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:23,229 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}
+2025-10-30 18:18:23,579 - watchfiles.main - DEBUG - 1 change detected: {(<Change.modified: 2>, '/home/mapleleaf/LCJRepos/gitprjs/DocAI/logs/server.log')}

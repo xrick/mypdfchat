@@ -8,7 +8,7 @@ Supports PDF, DOCX, TXT, and Markdown files.
 import logging
 import hashlib
 import io
-from typing import List, Dict, Optional, Tuple, BinaryIO
+from typing import List, Dict, Optional, Tuple, BinaryIO, Any
 from pathlib import Path
 from datetime import datetime, timezone
 

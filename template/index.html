@@ -1,3 +1,4 @@
+<!-- template/index.html -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -340,16 +341,7 @@
             <div class="source-list-header">您的資料來源</div>
 
             <ul id="sourceList" class="source-list">
-                <li class="source-item">
-                    <i class="fa-solid fa-file-pdf file-icon" style="color: #e63946;"></i>
-                    <span class="file-name">RAG_Survey_2024.pdf</span>
-                    <input type="checkbox" checked>
-                </li>
-                <li class="source-item">
-                    <i class="fa-solid fa-file-word file-icon" style="color: #2b579a;"></i>
-                    <span class="file-name">Meeting_Notes.docx</span>
-                    <input type="checkbox" checked>
-                </li>
+                <!-- Files will be added dynamically after upload -->
             </ul>
         </aside>
 
@@ -489,15 +481,21 @@
                 try {
                     const result = await window.docaiClient.uploadFile(file);
 
+                    // Debug: Check if file_id exists
+                    console.log('[DocAI Upload] Result:', result);
+                    console.log('[DocAI Upload] File ID:', result.file_id);
+
                     // 上傳成功，將 spinner 替換為 checkbox
                     window.docaiClient.updateFileStatus(newItem, 'completed', result.file_id);
 
-                    console.log('Upload completed:', result);
+                    console.log('[DocAI Upload] Upload completed:', result);
                 } catch (error) {
                     // 上傳失敗，顯示錯誤
                     window.docaiClient.updateFileStatus(newItem, 'error');
                     console.error('Upload failed:', error);
-                    alert('上傳失敗：' + error.message);
+                    // Ensure error.message is a string, not object
+                    const errorMsg = typeof error === 'string' ? error : (error.message || '未知錯誤');
+                    alert('上傳失敗：' + errorMsg);
                 }
 
                 // 清空 file input

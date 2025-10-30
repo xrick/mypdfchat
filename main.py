@@ -1,3 +1,4 @@
+# main.py
 """
 DocAI - RAG Application Main Entry Point
 
@@ -60,8 +61,8 @@ async def lifespan(app: FastAPI):
     try:
         from app.Providers.file_metadata_provider import get_file_metadata_provider
         file_metadata_provider = await get_file_metadata_provider()
-        await file_metadata_provider.initialize_database()
-        logger.info(" SQLite database initialized")
+        # Database already initialized by get_file_metadata_provider()
+        logger.info("✅ SQLite database provider initialized")
     except Exception as e:
         logger.error(f"L Failed to initialize database: {str(e)}")
 
@@ -172,17 +173,22 @@ def create_application() -> FastAPI:
             if not html_path.exists():
                 return HTMLResponse(
                     content="<h1>Frontend not found</h1><p>Please ensure template/index.html exists.</p>",
-                    status_code=404
+                    status_code=404,
+                    media_type="text/html; charset=utf-8"
                 )
 
             html_content = html_path.read_text(encoding='utf-8')
-            return HTMLResponse(content=html_content)
+            return HTMLResponse(
+                content=html_content,
+                media_type="text/html; charset=utf-8"
+            )
 
         except Exception as e:
             logger.error(f"Failed to serve frontend: {str(e)}")
             return HTMLResponse(
                 content=f"<h1>Error loading frontend</h1><p>{str(e)}</p>",
-                status_code=500
+                status_code=500,
+                media_type="text/html; charset=utf-8"
             )
 
     @app.get("/health", tags=["system"])

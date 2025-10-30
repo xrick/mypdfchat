@@ -1,3 +1,4 @@
+# app/Providers/llm_provider/client.py
 """
 LLM Provider Client
 
@@ -192,3 +193,7 @@ def get_llm_provider_client() -> LLMProviderClient:
             ...
     """
     return LLMProviderClient()
+
+
+# Alias for compatibility
+get_llm_provider = get_llm_provider_client

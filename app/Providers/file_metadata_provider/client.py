@@ -448,6 +448,7 @@ class FileMetadataProvider:
 
 # Singleton instance for dependency injection
 _file_metadata_provider_instance: Optional[FileMetadataProvider] = None
+_database_initialized: bool = False
 
 
 async def get_file_metadata_provider() -> FileMetadataProvider:
@@ -461,11 +462,14 @@ async def get_file_metadata_provider() -> FileMetadataProvider:
         ):
             ...
     """
-    global _file_metadata_provider_instance
+    global _file_metadata_provider_instance, _database_initialized
 
     if _file_metadata_provider_instance is None:
         _file_metadata_provider_instance = FileMetadataProvider()
-        # Initialize database tables on first access
+
+    # Initialize database only once (thread-safe initialization)
+    if not _database_initialized:
         await _file_metadata_provider_instance.initialize_database()
+        _database_initialized = True
 
     return _file_metadata_provider_instance

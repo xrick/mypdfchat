@@ -290,7 +290,7 @@ class HierarchicalChunkingStrategy(ChunkingStrategy):
 
         Logic:
         - Distribute children evenly among parents
-        - Example: 10 children, 5 parents ’ 2 children per parent
+        - Example: 10 children, 5 parents â†’ 2 children per parent
         """
         if parent_count == 0:
             return 0
