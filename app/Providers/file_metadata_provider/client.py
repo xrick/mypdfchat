@@ -40,6 +40,7 @@ class FileMetadataProvider:
         from app.core.config import settings
 
         self.db_path = Path(db_path or settings.SQLITE_DB_PATH)
+        self._connection: Optional[aiosqlite.Connection] = None
 
         # Ensure parent directory exists
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -48,14 +49,17 @@ class FileMetadataProvider:
 
     async def _get_connection(self) -> aiosqlite.Connection:
         """
-        Get database connection
+        Get database connection (singleton, reuses same connection)
 
         Returns:
             Async SQLite connection
         """
-        conn = await aiosqlite.connect(str(self.db_path))
-        conn.row_factory = aiosqlite.Row  # Enable dict-like access
-        return conn
+        if self._connection is None:
+            self._connection = await aiosqlite.connect(str(self.db_path))
+            self._connection.row_factory = aiosqlite.Row  # Enable dict-like access
+            logger.debug("Created new database connection")
+
+        return self._connection
 
     async def initialize_database(self):
         """
@@ -63,9 +67,10 @@ class FileMetadataProvider:
 
         Call this once during application startup
         """
-        async with await self._get_connection() as conn:
-            # Create file_metadata table
-            await conn.execute("""
+        conn = await self._get_connection()
+
+        # Create file_metadata table
+        await conn.execute("""
                 CREATE TABLE IF NOT EXISTS file_metadata (
                     file_id TEXT PRIMARY KEY,
                     filename TEXT NOT NULL,
@@ -149,7 +154,7 @@ class FileMetadataProvider:
             ...     chunk_count=150
             ... )
         """
-        async with await self._get_connection() as conn:
+        conn = await self._get_connection()
             try:
                 metadata_json = json.dumps(metadata) if metadata else None
 
@@ -188,7 +193,7 @@ class FileMetadataProvider:
             >>> if file:
             ...     print(f"Filename: {file['filename']}")
         """
-        async with await self._get_connection() as conn:
+        conn = await self._get_connection()
             try:
                 async with conn.execute(
                     "SELECT * FROM file_metadata WHERE file_id = ?",
@@ -229,7 +234,7 @@ class FileMetadataProvider:
         Example:
             >>> await provider.update_embedding_status("file_abc", "completed")
         """
-        async with await self._get_connection() as conn:
+        conn = await self._get_connection()
             try:
                 await conn.execute("""
                     UPDATE file_metadata
@@ -264,7 +269,7 @@ class FileMetadataProvider:
         Example:
             >>> files = await provider.list_files(user_id="user_123", limit=10)
         """
-        async with await self._get_connection() as conn:
+        conn = await self._get_connection()
             try:
                 if user_id:
                     query = """
@@ -314,7 +319,7 @@ class FileMetadataProvider:
         Example:
             >>> await provider.delete_file("file_abc123")
         """
-        async with await self._get_connection() as conn:
+        conn = await self._get_connection()
             try:
                 # Delete chunks first (foreign key constraint)
                 await conn.execute(
@@ -358,7 +363,7 @@ class FileMetadataProvider:
             ... ]
             >>> await provider.add_chunks("file_abc", chunks)
         """
-        async with await self._get_connection() as conn:
+        conn = await self._get_connection()
             try:
                 for chunk in chunks:
                     await conn.execute("""
@@ -390,7 +395,7 @@ class FileMetadataProvider:
         Returns:
             List of chunk metadata dicts
         """
-        async with await self._get_connection() as conn:
+        conn = await self._get_connection()
             try:
                 async with conn.execute(
                     "SELECT * FROM chunks_metadata WHERE file_id = ? ORDER BY chunk_index",
@@ -418,7 +423,7 @@ class FileMetadataProvider:
             >>> stats = await provider.get_stats()
             >>> print(f"Total files: {stats['total_files']}")
         """
-        async with await self._get_connection() as conn:
+        conn = await self._get_connection()
             try:
                 # Total files
                 async with conn.execute("SELECT COUNT(*) FROM file_metadata") as cursor:

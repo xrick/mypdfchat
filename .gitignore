@@ -1,4 +1,7 @@
+# .gitignore
 pdfch_bk/
 .chatenv/
 .docaienv/
+app/api/v1/__pycache__/
+docaienv/
 
