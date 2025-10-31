@@ -5,3 +5,9 @@ pdfch_bk/
 app/api/v1/__pycache__/
 docaienv/
 
+/__pycache__
+/__pycache__
+/app/api/v1/endpoints/__pycache__
+__pycache__/main.cpython-311.pyc
+app/api/v1/endpoints/__pycache__/upload.cpython-311.pyc
+app/Providers/file_metadata_provider/__pycache__/client.cpython-311.pyc
