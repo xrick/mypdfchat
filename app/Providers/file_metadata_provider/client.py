@@ -450,6 +450,96 @@ class FileMetadataProvider:
                 logger.error(f"Failed to get database stats: {str(e)}")
                 return {}
 
+    async def list_files_by_user(
+        self,
+        user_id: str,
+        limit: int = 50,
+        offset: int = 0
+    ) -> List[Dict[str, Any]]:
+        """
+        List all files owned by a specific user
+
+        Args:
+            user_id: User identifier (UUID format)
+            limit: Maximum number of files to return (default: 50)
+            offset: Number of files to skip for pagination (default: 0)
+
+        Returns:
+            List of file metadata dicts
+
+        Example:
+            >>> files = await provider.list_files_by_user(
+            ...     "550e8400-e29b-41d4-a716-446655440000",
+            ...     limit=10
+            ... )
+            >>> print(f"Found {len(files)} files")
+        """
+        conn = await self._get_connection()
+        try:
+            async with conn.execute(
+                """
+                SELECT * FROM file_metadata
+                WHERE user_id = ?
+                ORDER BY upload_time DESC
+                LIMIT ? OFFSET ?
+                """,
+                (user_id, limit, offset)
+            ) as cursor:
+                rows = await cursor.fetchall()
+
+                files = []
+                for row in rows:
+                    file_dict = dict(row)
+                    # Parse metadata_json if present
+                    if file_dict.get("metadata_json"):
+                        try:
+                            file_dict["metadata"] = json.loads(file_dict["metadata_json"])
+                        except json.JSONDecodeError:
+                            file_dict["metadata"] = {}
+                    files.append(file_dict)
+
+                logger.info(f"Listed {len(files)} files for user {user_id}")
+                return files
+
+        except Exception as e:
+            logger.error(f"Failed to list files for user {user_id}: {str(e)}")
+            raise
+
+    async def delete_file(self, file_id: str):
+        """
+        Delete file and all associated chunks from database
+
+        Args:
+            file_id: Unique file identifier
+
+        Raises:
+            Exception: If deletion fails
+
+        Example:
+            >>> await provider.delete_file("file_abc123")
+        """
+        conn = await self._get_connection()
+        try:
+            # Delete associated chunks first (foreign key constraint)
+            await conn.execute(
+                "DELETE FROM chunks_metadata WHERE file_id = ?",
+                (file_id,)
+            )
+
+            # Delete file metadata
+            await conn.execute(
+                "DELETE FROM file_metadata WHERE file_id = ?",
+                (file_id,)
+            )
+
+            await conn.commit()
+            logger.info(f"Deleted file {file_id} and associated chunks")
+
+        except Exception as e:
+            logger.error(f"Failed to delete file {file_id}: {str(e)}")
+            await conn.rollback()
+            raise
+
 
 # Singleton instance for dependency injection
 _file_metadata_provider_instance: Optional[FileMetadataProvider] = None

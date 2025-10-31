@@ -13,6 +13,7 @@
 class DocAIClient {
     constructor() {
         this.sessionId = this.generateSessionId();
+        this.userId = this.getUserId(); // Get or generate UUID for multi-user support
         this.uploadedFiles = new Map(); // fileId → {filename, status}
         this.currentEventSource = null;
 
@@ -67,6 +68,38 @@ class DocAIClient {
     }
 
     /**
+     * Get or generate user UUID (UUID v4) for multi-user support
+     * Persists in localStorage for consistent user identification
+     * @returns {string} - UUID v4 string
+     */
+    getUserId() {
+        // Check if UUID already exists in localStorage
+        let userId = localStorage.getItem('docai_user_id');
+
+        if (!userId) {
+            // Generate UUID v4 using crypto.randomUUID() (modern browsers)
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                userId = crypto.randomUUID();
+            } else {
+                // Fallback for older browsers: manual UUID v4 generation
+                userId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            // Store in localStorage for persistence
+            localStorage.setItem('docai_user_id', userId);
+            console.log('[DocAI] Generated new user_id:', userId);
+        } else {
+            console.log('[DocAI] Using existing user_id:', userId);
+        }
+
+        return userId;
+    }
+
+    /**
      * Upload file to backend
      * @param {File} file - File object from input
      * @returns {Promise<Object>} - Upload response with file_id
@@ -78,6 +111,9 @@ class DocAIClient {
         try {
             const response = await fetch('/api/v1/upload', {
                 method: 'POST',
+                headers: {
+                    'X-User-ID': this.userId  // Multi-user support: Send user UUID
+                },
                 body: formData
             });
 

@@ -95,23 +95,58 @@ print_success "虛擬環境已就緒"
 
 # Check MongoDB
 print_step "檢查 MongoDB 服務..."
-if ! systemctl is-active --quiet mongod; then
-    print_warning "MongoDB 服務未運行"
-    print_info "嘗試啟動 MongoDB..."
-    if sudo systemctl start mongod; then
-        print_success "MongoDB 服務已啟動"
+
+# Detect OS and check MongoDB accordingly
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS - use brew services
+    if brew services list | grep -q "mongodb-community.*started"; then
+        print_success "MongoDB 服務運行中 (Homebrew)"
     else
-        print_error "無法啟動 MongoDB 服務"
-        print_info "請手動檢查: sudo systemctl status mongod"
-        exit 1
+        print_warning "MongoDB 服務未運行"
+        print_info "嘗試啟動 MongoDB..."
+        if brew services start mongodb-community; then
+            print_success "MongoDB 服務已啟動"
+            sleep 3  # Wait for MongoDB to initialize
+        else
+            print_error "無法啟動 MongoDB 服務"
+            print_info "請手動檢查: brew services list"
+            exit 1
+        fi
+    fi
+elif command -v systemctl &> /dev/null; then
+    # Linux - use systemctl
+    if ! systemctl is-active --quiet mongod; then
+        print_warning "MongoDB 服務未運行"
+        print_info "嘗試啟動 MongoDB..."
+        if sudo systemctl start mongod; then
+            print_success "MongoDB 服務已啟動"
+        else
+            print_error "無法啟動 MongoDB 服務"
+            print_info "請手動檢查: sudo systemctl status mongod"
+            exit 1
+        fi
+    else
+        print_success "MongoDB 服務運行中"
     fi
 else
-    print_success "MongoDB 服務運行中"
+    print_warning "無法檢測服務管理器，將嘗試直接連接 MongoDB"
 fi
 
 # Test MongoDB connection
 print_step "測試 MongoDB 連接..."
-if timeout 5 mongosh --quiet --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
+
+# Cross-platform timeout function
+test_mongodb_connection() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS - use perl for timeout (timeout command not available by default)
+        perl -e 'alarm shift; exec @ARGV' 5 mongosh --quiet --eval "db.adminCommand('ping')" > /dev/null 2>&1
+    else
+        # Linux - use timeout command
+        timeout 5 mongosh --quiet --eval "db.adminCommand('ping')" > /dev/null 2>&1
+    fi
+}
+
+if test_mongodb_connection; then
     print_success "MongoDB 連接正常"
 else
     print_error "無法連接到 MongoDB"
@@ -121,13 +156,32 @@ fi
 
 # Check Redis (if configured)
 print_step "檢查 Redis 服務..."
-if systemctl is-active --quiet redis-server || systemctl is-active --quiet redis; then
-    print_success "Redis 服務運行中"
-elif ! grep -q "redis://" "$PROJECT_ROOT/.env" 2>/dev/null; then
+
+# Check if Redis is configured in .env
+if ! grep -q "redis://" "$PROJECT_ROOT/.env" 2>/dev/null; then
     print_info "Redis 未配置 (可選)"
 else
-    print_warning "Redis 已配置但服務未運行"
-    print_info "某些快取功能可能無法使用"
+    # Detect OS and check Redis accordingly
+    REDIS_RUNNING=false
+
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS - use brew services
+        if brew services list | grep -q "redis.*started"; then
+            REDIS_RUNNING=true
+        fi
+    elif command -v systemctl &> /dev/null; then
+        # Linux - use systemctl
+        if systemctl is-active --quiet redis-server || systemctl is-active --quiet redis; then
+            REDIS_RUNNING=true
+        fi
+    fi
+
+    if [ "$REDIS_RUNNING" = true ]; then
+        print_success "Redis 服務運行中"
+    else
+        print_warning "Redis 已配置但服務未運行"
+        print_info "某些快取功能可能無法使用"
+    fi
 fi
 
 # ============================================
@@ -142,7 +196,7 @@ check_port_conflict() {
     print_step "檢查端口 $port ($service_name)..."
 
     if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
-        local pid=$(lsof -Pi :$port -sTCP:LISTEN -t)
+        local pid=$(lsof -Pi :$port -sTCP:LISTEN -t | head -1)
         local process=$(ps -p $pid -o comm= 2>/dev/null || echo "unknown")
 
         print_warning "端口 $port 已被佔用 (PID: $pid, Process: $process)"
@@ -150,22 +204,60 @@ check_port_conflict() {
         # Check if it's our own server
         if [ -f "$PID_FILE" ] && [ "$(cat $PID_FILE)" == "$pid" ]; then
             print_info "這是 DocAI 服務本身，將先停止舊實例..."
-            kill $pid 2>/dev/null && sleep 2
-            return 0
-        fi
+            # Kill all processes using this port (parent and children)
+            local all_pids=$(lsof -Pi :$port -sTCP:LISTEN -t)
+            for p in $all_pids; do
+                kill $p 2>/dev/null
+            done
+            sleep 2
 
-        echo -n "是否終止該進程? (y/n): "
-        read -r response
-        if [[ "$response" =~ ^[Yy]$ ]]; then
-            if kill $pid 2>/dev/null; then
-                print_success "進程已終止"
-                sleep 2
-            else
-                print_error "無法終止進程 (可能需要 sudo 權限)"
-                return 1
+            # Verify processes actually died
+            local remaining_pids=$(lsof -Pi :$port -sTCP:LISTEN -t 2>/dev/null)
+            if [ -n "$remaining_pids" ]; then
+                print_warning "部分進程未響應 SIGTERM，使用 SIGKILL 強制終止..."
+                for p in $remaining_pids; do
+                    kill -9 $p 2>/dev/null
+                done
+                sleep 1
             fi
         else
-            print_error "端口衝突未解決，無法繼續"
+            echo -n "是否終止該進程? (y/n): "
+            read -r response
+            if [[ "$response" =~ ^[Yy]$ ]]; then
+                # Try graceful shutdown first for all processes on this port
+                print_info "正在等待進程終止..."
+                local all_pids=$(lsof -Pi :$port -sTCP:LISTEN -t)
+                for p in $all_pids; do
+                    kill $p 2>/dev/null
+                done
+                sleep 3
+
+                # Verify processes actually died
+                local remaining_pids=$(lsof -Pi :$port -sTCP:LISTEN -t 2>/dev/null)
+                if [ -n "$remaining_pids" ]; then
+                    print_warning "部分進程未響應 SIGTERM，使用 SIGKILL 強制終止..."
+                    for p in $remaining_pids; do
+                        kill -9 $p 2>/dev/null
+                    done
+                    sleep 1
+
+                    # Final verification
+                    remaining_pids=$(lsof -Pi :$port -sTCP:LISTEN -t 2>/dev/null)
+                    if [ -n "$remaining_pids" ]; then
+                        print_error "無法終止進程 (可能需要 sudo 權限)"
+                        return 1
+                    fi
+                fi
+                print_success "進程已終止"
+            else
+                print_error "端口衝突未解決，無法繼續"
+                return 1
+            fi
+        fi
+
+        # Final port availability check
+        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+            print_error "端口 $port 仍被佔用，無法繼續"
             return 1
         fi
     else
@@ -266,7 +358,12 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     # Check if process is still alive
     if ! ps -p $SERVER_PID > /dev/null 2>&1; then
         print_error "服務器進程意外終止"
-        print_info "查看日誌: tail -f logs/server.log"
+        echo ""
+        print_info "最近的錯誤日誌:"
+        echo "----------------------------------------"
+        tail -20 logs/server.log | grep -i "error\|exception\|failed\|errno" || tail -10 logs/server.log
+        echo "----------------------------------------"
+        print_info "完整日誌: tail -f logs/server.log"
         exit 1
     fi
 

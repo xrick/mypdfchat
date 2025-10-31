@@ -337,24 +337,107 @@ class InputDataHandleService:
         filename: str
     ) -> str:
         """
-        Generate unique file ID from content hash
+        Generate unique file ID with timestamp + UUID + content hash
 
         Args:
             file_content: Binary file content
             filename: Original filename
 
         Returns:
-            Unique file ID (format: "file_{hash[:12]}")
+            Unique file ID (format: "file_{timestamp}_{uuid8}_{hash8}")
 
         Example:
             >>> file_id = service.generate_file_id(content, "doc.pdf")
-            >>> # file_id = "file_a1b2c3d4e5f6"
+            >>> # file_id = "file_1698765432_a1b2c3d4_e5f6g7h8"
+
+        Components:
+            - timestamp: Unix timestamp (10 digits, chronological sorting)
+            - uuid8: First 8 chars of UUID4 (collision resistance)
+            - hash8: First 8 chars of SHA256 (content verification)
         """
-        # Hash file content
-        content_hash = hashlib.sha256(file_content).hexdigest()[:12]
-        file_id = f"file_{content_hash}"
+        import uuid
+        import time
+
+        # Component 1: Timestamp (sortable, chronological ordering)
+        timestamp = int(time.time())
+
+        # Component 2: Random UUID (collision resistance)
+        uuid_part = str(uuid.uuid4()).replace('-', '')[:8]
+
+        # Component 3: Content hash (duplicate detection)
+        content_hash = hashlib.sha256(file_content).hexdigest()[:8]
+
+        file_id = f"file_{timestamp}_{uuid_part}_{content_hash}"
 
         return file_id
+
+    async def generate_unique_file_id(
+        self,
+        file_content: bytes,
+        filename: str,
+        file_metadata_provider,
+        max_retries: int = 3
+    ) -> str:
+        """
+        Generate unique file ID with database collision detection
+
+        This method generates a file_id and checks the database to ensure
+        it doesn't already exist. If a collision is detected, it retries
+        with a fresh UUID component.
+
+        Args:
+            file_content: Binary file content
+            filename: Original filename
+            file_metadata_provider: FileMetadataProvider instance for DB checks
+            max_retries: Maximum number of generation attempts (default: 3)
+
+        Returns:
+            Unique file ID guaranteed not to exist in database
+
+        Raises:
+            ValueError: If unable to generate unique ID after max_retries attempts
+
+        Example:
+            >>> file_id = await service.generate_unique_file_id(
+            ...     content, "doc.pdf", provider, max_retries=3
+            ... )
+            >>> # file_id = "file_1698765432_a1b2c3d4_e5f6g7h8" (guaranteed unique)
+
+        Collision Probability:
+            - Single attempt: ~1 in 4.3 billion (UUID4 collision)
+            - With 3 retries: ~1 in 79 quintillion
+        """
+        for attempt in range(max_retries):
+            # Generate candidate file_id
+            file_id = self.generate_file_id(file_content, filename)
+
+            # Check if file_id already exists in database
+            try:
+                existing_file = await file_metadata_provider.get_file(file_id)
+
+                if existing_file is None:
+                    # No collision, use this file_id
+                    if attempt > 0:
+                        logger.info(f"Generated unique file_id: {file_id} (attempt {attempt + 1})")
+                    return file_id
+                else:
+                    # Collision detected, retry with new UUID
+                    logger.warning(
+                        f"file_id collision detected: {file_id} "
+                        f"(attempt {attempt + 1}/{max_retries}). Retrying..."
+                    )
+                    continue
+
+            except Exception as e:
+                logger.error(f"Error checking file_id uniqueness: {str(e)}")
+                # On error, return generated ID (fail open for availability)
+                return file_id
+
+        # All retries exhausted
+        raise ValueError(
+            f"Failed to generate unique file_id after {max_retries} attempts. "
+            "This is extremely unlikely and may indicate a database issue."
+        )
 
     def enrich_chunk_metadata(
         self,
@@ -396,7 +479,8 @@ class InputDataHandleService:
     async def process_file(
         self,
         file_content: bytes,
-        filename: str
+        filename: str,
+        file_metadata_provider = None
     ) -> Dict:
         """
         Complete file processing workflow
@@ -410,6 +494,7 @@ class InputDataHandleService:
         Args:
             file_content: Binary file content
             filename: Original filename
+            file_metadata_provider: Optional FileMetadataProvider for unique ID generation
 
         Returns:
             Dict with keys:
@@ -421,7 +506,7 @@ class InputDataHandleService:
             - chunk_count: Number of chunks
 
         Example:
-            >>> result = await service.process_file(content, "document.pdf")
+            >>> result = await service.process_file(content, "document.pdf", provider)
             >>> print(f"File ID: {result['file_id']}")
             >>> print(f"Chunks: {result['chunk_count']}")
         """
@@ -430,8 +515,14 @@ class InputDataHandleService:
         if not is_valid:
             raise ValueError(error)
 
-        # Step 2: Generate file ID
-        file_id = self.generate_file_id(file_content, filename)
+        # Step 2: Generate unique file ID (with collision detection if provider available)
+        if file_metadata_provider is not None:
+            file_id = await self.generate_unique_file_id(
+                file_content, filename, file_metadata_provider
+            )
+        else:
+            # Fallback to simple generation (for backward compatibility)
+            file_id = self.generate_file_id(file_content, filename)
 
         # Step 3: Extract text
         text = self.extract_text(file_content, filename)

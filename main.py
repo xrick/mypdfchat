@@ -138,7 +138,7 @@ def create_application() -> FastAPI:
     # Legacy Compatibility Routers
     # =============================================================================
     # Import individual endpoint routers for legacy compatibility
-    from app.api.v1.endpoints import upload, chat
+    from app.api.v1.endpoints import upload, chat, files
 
     # Legacy upload endpoint: /upload-pdf/ (frontend compatibility)
     app.include_router(
@@ -155,6 +155,14 @@ def create_application() -> FastAPI:
         tags=["chat-legacy"]
     )
     logger.info("🔌 Legacy chat endpoint registered at /chat")
+
+    # File management endpoints: /api/v1/files (RESTful multi-user support)
+    app.include_router(
+        files.router,
+        prefix="/api/v1",
+        tags=["file-management"]
+    )
+    logger.info("📁 File management endpoints registered at /api/v1/files")
 
     # =============================================================================
     # Frontend Routes

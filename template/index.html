@@ -312,6 +312,15 @@
             font-size: 0.95rem;
             color: #8a8a8a;
             font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* When file is selected, change text color */
+        .upload-area-text.file-selected {
+            color: var(--color-text-primary);
+            font-weight: 500;
         }
 
         .upload-area-divider {
@@ -453,8 +462,8 @@
         <input type="file" id="fileInput" multiple>
 
         <label for="fileInput" class="upload-area" id="uploadArea">
-            <span class="upload-area-text">Drag & Drop File</span>
-            <span class="upload-area-divider">Or</span>
+            <span class="upload-area-text" id="uploadAreaText">Drag & Drop File</span>
+            <span class="upload-area-divider" id="uploadAreaDivider">Or</span>
             <div class="browse-btn">
                 <i class="fa-solid fa-folder-open"></i>
                 <span>BROWSE</span>
@@ -479,6 +488,8 @@
             const cancelUploadBtn = document.getElementById('cancelUploadBtn');
             const confirmUploadBtn = document.getElementById('confirmUploadBtn');
             const uploadArea = document.getElementById('uploadArea');
+            const uploadAreaText = document.getElementById('uploadAreaText');
+            const uploadAreaDivider = document.getElementById('uploadAreaDivider');
             const fileInput = document.getElementById('fileInput');
             const sourceList = document.getElementById('sourceList');
             const tabs = document.querySelectorAll('.tab-link');
@@ -503,12 +514,34 @@
             // --- 3. 模態框 (MODAL) 邏輯 ---
             // 3.1 打開模態框
             addSourceBtn.addEventListener('click', () => {
+                // Reset upload area text when opening modal
+                uploadAreaText.textContent = 'Drag & Drop File';
+                uploadAreaText.classList.remove('file-selected');
+                uploadAreaDivider.style.display = 'block';
+                fileInput.value = ''; // Clear file input
                 uploadModal.showModal(); // 使用 HTML <dialog> 元素的原生方法
             });
 
             // 3.2 關閉模態框
             cancelUploadBtn.addEventListener('click', () => {
                 uploadModal.close(); // 使用 HTML <dialog> 元素的原生方法
+            });
+
+            // 3.3 監聽文件選擇變化 - 顯示選中的文件名
+            fileInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                if (files && files.length > 0) {
+                    // 當用戶選擇文件後，顯示文件名而不是 "Drag & Drop File"
+                    const file = files[0];
+                    uploadAreaText.innerHTML = `<i class="fa-solid fa-file-pdf" style="color: var(--color-primary); margin-right: 0.5rem;"></i>${file.name}`;
+                    uploadAreaText.classList.add('file-selected');
+                    uploadAreaDivider.style.display = 'none'; // 隱藏 "Or" 分隔線
+                } else {
+                    // 如果沒有文件被選中，恢復原始狀態
+                    uploadAreaText.textContent = 'Drag & Drop File';
+                    uploadAreaText.classList.remove('file-selected');
+                    uploadAreaDivider.style.display = 'block';
+                }
             });
             
             // 點擊模態框背景時也關閉 (可選)

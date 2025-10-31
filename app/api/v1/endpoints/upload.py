@@ -8,7 +8,7 @@ POST /api/v1/upload - Upload single PDF file for processing
 """
 
 import logging
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, BackgroundTasks, Header
 from pathlib import Path
 import shutil
 from typing import Optional
@@ -75,38 +75,46 @@ def save_uploaded_file(file_content: bytes, filename: str, file_id: str) -> Path
 async def process_and_embed_file(
     file_content: bytes,
     filename: str,
+    user_id: str,
     input_service: InputDataHandleService,
     retrieval_service: RetrievalService,
     file_metadata_provider: FileMetadataProvider,
     embedding_provider
 ) -> dict:
     """
-    Process file and generate embeddings
+    Process file and generate embeddings (Multi-User Support)
 
     Workflow:
     1. Extract text from PDF
     2. Chunk text using hierarchical strategy
     3. Generate embeddings for chunks
     4. Store in vector database
-    5. Update file metadata
+    5. Update file metadata with user ownership
 
     Args:
         file_content: Binary file content
         filename: Original filename
+        user_id: User identifier (UUID format)
         input_service: Input data handle service
         retrieval_service: Retrieval service for embedding
         file_metadata_provider: File metadata provider
         embedding_provider: Embedding provider
 
     Returns:
-        Processing result dict
+        Processing result dict with user_id
 
     Example:
-        >>> result = await process_and_embed_file(content, "doc.pdf", ...)
+        >>> result = await process_and_embed_file(
+        ...     content, "doc.pdf", "550e8400-...", ...
+        ... )
     """
     try:
-        # Step 1: Process file (extract + chunk)
-        process_result = await input_service.process_file(file_content, filename)
+        # Step 1: Process file (extract + chunk) with unique file_id generation
+        process_result = await input_service.process_file(
+            file_content,
+            filename,
+            file_metadata_provider  # Pass provider for collision detection
+        )
 
         file_id = process_result["file_id"]
         chunks = process_result["chunks"]
@@ -117,12 +125,13 @@ async def process_and_embed_file(
             f"(strategy: {process_result['chunking_strategy']})"
         )
 
-        # Step 2: Store file metadata in SQLite
+        # Step 2: Store file metadata in SQLite (with user ownership)
         await file_metadata_provider.add_file(
             file_id=file_id,
             filename=filename,
             file_type="pdf",
             file_size=process_result["file_size"],
+            user_id=user_id,  # NEW: Associate file with user
             chunk_count=chunk_count,
             milvus_partition=f"file_{file_id}",
             metadata={
@@ -205,6 +214,7 @@ async def process_and_embed_file(
 )
 async def upload_pdf(
     file: UploadFile = File(..., description="PDF file to upload"),
+    user_id: str = Header(..., alias="X-User-ID", description="User UUID (required)"),
     background_tasks: BackgroundTasks = BackgroundTasks(),
     input_service: InputDataHandleService = Depends(get_input_data_service),
     file_metadata_provider: FileMetadataProvider = Depends(get_file_metadata_provider),
@@ -212,10 +222,11 @@ async def upload_pdf(
     embedding_provider = Depends(get_embedding_provider)
 ):
     """
-    Upload PDF file for processing and indexing
+    Upload PDF file for processing and indexing (Multi-User Support)
 
     Args:
         file: Uploaded PDF file
+        user_id: User identifier (UUID v4 format, required via X-User-ID header)
         background_tasks: FastAPI background tasks for async processing
         input_service: Input data handle service (dependency injection)
         file_metadata_provider: File metadata provider (dependency injection)
@@ -231,9 +242,22 @@ async def upload_pdf(
     Example:
         ```bash
         curl -X POST "http://localhost:8000/api/v1/upload" \\
+          -H "X-User-ID: 550e8400-e29b-41d4-a716-446655440000" \\
           -F "file=@document.pdf"
         ```
     """
+    # Validate user_id format (UUID v4)
+    import re
+    UUID_PATTERN = r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+    if not re.match(UUID_PATTERN, user_id, re.IGNORECASE):
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": "ValidationError",
+                "message": "Invalid user_id format. Must be UUID v4.",
+                "details": {"user_id": user_id, "expected_format": "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"}
+            }
+        )
     try:
         # Validate file extension
         if not file.filename.endswith('.pdf'):
@@ -261,10 +285,11 @@ async def upload_pdf(
                 }
             )
 
-        # Process file and generate embeddings
+        # Process file and generate embeddings (with user ownership)
         result = await process_and_embed_file(
             file_content=file_content,
             filename=file.filename,
+            user_id=user_id,  # NEW: Pass user_id for ownership tracking
             input_service=input_service,
             retrieval_service=retrieval_service,
             file_metadata_provider=file_metadata_provider,

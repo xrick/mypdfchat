@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Upload Fix</title>
+    <script src="/static/js/docai-client.js"></script>
+</head>
+<body>
+    <h1>Test Upload with User ID</h1>
+    <input type="file" id="fileInput" accept=".pdf">
+    <button onclick="testUpload()">Upload</button>
+    <div id="result"></div>
+
+    <script>
+        // Initialize DocAI Client
+        const client = new DocAIClient();
+
+        // Show user_id
+        document.getElementById('result').innerHTML = `
+            <p>User ID: ${client.userId}</p>
+            <p>Session ID: ${client.sessionId}</p>
+        `;
+
+        async function testUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            try {
+                const result = await client.uploadFile(file);
+                document.getElementById('result').innerHTML += `
+                    <p style="color: green;">✅ Upload successful!</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML += `
+                    <p style="color: red;">❌ Upload failed: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
