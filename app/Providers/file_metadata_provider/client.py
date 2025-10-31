@@ -83,39 +83,39 @@ class FileMetadataProvider:
                     milvus_partition TEXT,
                     metadata_json TEXT
                 )
-            """)
+        """)
 
-            # Create chunks_metadata table (optional, for detailed tracking)
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS chunks_metadata (
-                    chunk_id TEXT PRIMARY KEY,
-                    file_id TEXT,
-                    chunk_index INTEGER,
-                    chunk_text TEXT,
-                    milvus_id INTEGER,
-                    FOREIGN KEY (file_id) REFERENCES file_metadata(file_id)
-                )
-            """)
+        # Create chunks_metadata table (optional, for detailed tracking)
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS chunks_metadata (
+                chunk_id TEXT PRIMARY KEY,
+                file_id TEXT,
+                chunk_index INTEGER,
+                chunk_text TEXT,
+                milvus_id INTEGER,
+                FOREIGN KEY (file_id) REFERENCES file_metadata(file_id)
+            )
+        """)
 
-            # Create indexes
-            await conn.execute("""
-                CREATE INDEX IF NOT EXISTS idx_file_user
-                ON file_metadata(user_id)
-            """)
+        # Create indexes
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_file_user
+            ON file_metadata(user_id)
+        """)
 
-            await conn.execute("""
-                CREATE INDEX IF NOT EXISTS idx_file_upload_time
-                ON file_metadata(upload_time)
-            """)
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_file_upload_time
+            ON file_metadata(upload_time)
+        """)
 
-            await conn.execute("""
-                CREATE INDEX IF NOT EXISTS idx_chunk_file_id
-                ON chunks_metadata(file_id)
-            """)
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_chunk_file_id
+            ON chunks_metadata(file_id)
+        """)
 
-            await conn.commit()
+        await conn.commit()
 
-            logger.info("Database tables initialized")
+        logger.info("Database tables initialized")
 
     # =========================================================================
     # File Metadata Operations
@@ -155,26 +155,26 @@ class FileMetadataProvider:
             ... )
         """
         conn = await self._get_connection()
-            try:
-                metadata_json = json.dumps(metadata) if metadata else None
+        try:
+            metadata_json = json.dumps(metadata) if metadata else None
 
-                await conn.execute("""
-                    INSERT INTO file_metadata (
-                        file_id, filename, file_type, file_size,
-                        upload_time, user_id, chunk_count,
-                        embedding_status, milvus_partition, metadata_json
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
+            await conn.execute("""
+                INSERT INTO file_metadata (
                     file_id, filename, file_type, file_size,
-                    datetime.now(timezone.utc).isoformat(),
-                    user_id, chunk_count,
-                    'pending', milvus_partition, metadata_json
-                ))
+                    upload_time, user_id, chunk_count,
+                    embedding_status, milvus_partition, metadata_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                file_id, filename, file_type, file_size,
+                datetime.now(timezone.utc).isoformat(),
+                user_id, chunk_count,
+                'pending', milvus_partition, metadata_json
+            ))
 
-                await conn.commit()
-                logger.info(f"Added file metadata: {file_id}")
+            await conn.commit()
+            logger.info(f"Added file metadata: {file_id}")
 
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Failed to add file metadata: {str(e)}")
                 raise
 
@@ -194,28 +194,28 @@ class FileMetadataProvider:
             ...     print(f"Filename: {file['filename']}")
         """
         conn = await self._get_connection()
-            try:
-                async with conn.execute(
-                    "SELECT * FROM file_metadata WHERE file_id = ?",
-                    (file_id,)
-                ) as cursor:
-                    row = await cursor.fetchone()
+        try:
+            async with conn.execute(
+                "SELECT * FROM file_metadata WHERE file_id = ?",
+                (file_id,)
+            ) as cursor:
+                row = await cursor.fetchone()
 
-                    if row:
-                        file_data = dict(row)
+                if row:
+                    file_data = dict(row)
 
-                        # Parse metadata_json
-                        if file_data.get('metadata_json'):
-                            file_data['metadata'] = json.loads(file_data['metadata_json'])
-                            del file_data['metadata_json']
-                        else:
-                            file_data['metadata'] = {}
+                    # Parse metadata_json
+                    if file_data.get('metadata_json'):
+                        file_data['metadata'] = json.loads(file_data['metadata_json'])
+                        del file_data['metadata_json']
+                    else:
+                        file_data['metadata'] = {}
 
-                        return file_data
+                    return file_data
 
-                    return None
+                return None
 
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Failed to get file metadata: {str(e)}")
                 return None
 
@@ -235,17 +235,17 @@ class FileMetadataProvider:
             >>> await provider.update_embedding_status("file_abc", "completed")
         """
         conn = await self._get_connection()
-            try:
-                await conn.execute("""
-                    UPDATE file_metadata
-                    SET embedding_status = ?
-                    WHERE file_id = ?
-                """, (status, file_id))
+        try:
+            await conn.execute("""
+                UPDATE file_metadata
+                SET embedding_status = ?
+                WHERE file_id = ?
+            """, (status, file_id))
 
-                await conn.commit()
-                logger.debug(f"Updated embedding status for {file_id}: {status}")
+            await conn.commit()
+            logger.debug(f"Updated embedding status for {file_id}: {status}")
 
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Failed to update embedding status: {str(e)}")
                 raise
 
@@ -270,42 +270,42 @@ class FileMetadataProvider:
             >>> files = await provider.list_files(user_id="user_123", limit=10)
         """
         conn = await self._get_connection()
-            try:
-                if user_id:
-                    query = """
-                        SELECT * FROM file_metadata
-                        WHERE user_id = ?
-                        ORDER BY upload_time DESC
-                        LIMIT ? OFFSET ?
-                    """
-                    params = (user_id, limit, offset)
-                else:
-                    query = """
-                        SELECT * FROM file_metadata
-                        ORDER BY upload_time DESC
-                        LIMIT ? OFFSET ?
-                    """
-                    params = (limit, offset)
+        try:
+            if user_id:
+                query = """
+                    SELECT * FROM file_metadata
+                    WHERE user_id = ?
+                    ORDER BY upload_time DESC
+                    LIMIT ? OFFSET ?
+                """
+                params = (user_id, limit, offset)
+            else:
+                query = """
+                    SELECT * FROM file_metadata
+                    ORDER BY upload_time DESC
+                    LIMIT ? OFFSET ?
+                """
+                params = (limit, offset)
 
-                async with conn.execute(query, params) as cursor:
-                    rows = await cursor.fetchall()
+            async with conn.execute(query, params) as cursor:
+                rows = await cursor.fetchall()
 
-                    files = []
-                    for row in rows:
-                        file_data = dict(row)
+                files = []
+                for row in rows:
+                    file_data = dict(row)
 
-                        # Parse metadata_json
-                        if file_data.get('metadata_json'):
-                            file_data['metadata'] = json.loads(file_data['metadata_json'])
-                            del file_data['metadata_json']
-                        else:
-                            file_data['metadata'] = {}
+                    # Parse metadata_json
+                    if file_data.get('metadata_json'):
+                        file_data['metadata'] = json.loads(file_data['metadata_json'])
+                        del file_data['metadata_json']
+                    else:
+                        file_data['metadata'] = {}
 
-                        files.append(file_data)
+                    files.append(file_data)
 
-                    return files
+                return files
 
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Failed to list files: {str(e)}")
                 return []
 
@@ -320,23 +320,23 @@ class FileMetadataProvider:
             >>> await provider.delete_file("file_abc123")
         """
         conn = await self._get_connection()
-            try:
-                # Delete chunks first (foreign key constraint)
-                await conn.execute(
-                    "DELETE FROM chunks_metadata WHERE file_id = ?",
-                    (file_id,)
-                )
+        try:
+            # Delete chunks first (foreign key constraint)
+            await conn.execute(
+                "DELETE FROM chunks_metadata WHERE file_id = ?",
+                (file_id,)
+            )
 
-                # Delete file metadata
-                await conn.execute(
-                    "DELETE FROM file_metadata WHERE file_id = ?",
-                    (file_id,)
-                )
+            # Delete file metadata
+            await conn.execute(
+                "DELETE FROM file_metadata WHERE file_id = ?",
+                (file_id,)
+            )
 
-                await conn.commit()
-                logger.info(f"Deleted file metadata: {file_id}")
+            await conn.commit()
+            logger.info(f"Deleted file metadata: {file_id}")
 
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Failed to delete file metadata: {str(e)}")
                 raise
 
@@ -364,24 +364,24 @@ class FileMetadataProvider:
             >>> await provider.add_chunks("file_abc", chunks)
         """
         conn = await self._get_connection()
-            try:
-                for chunk in chunks:
-                    await conn.execute("""
-                        INSERT INTO chunks_metadata (
-                            chunk_id, file_id, chunk_index, chunk_text, milvus_id
-                        ) VALUES (?, ?, ?, ?, ?)
-                    """, (
-                        chunk['chunk_id'],
-                        file_id,
-                        chunk['chunk_index'],
-                        chunk.get('chunk_text', ''),
-                        chunk.get('milvus_id')
-                    ))
+        try:
+            for chunk in chunks:
+                await conn.execute("""
+                    INSERT INTO chunks_metadata (
+                        chunk_id, file_id, chunk_index, chunk_text, milvus_id
+                    ) VALUES (?, ?, ?, ?, ?)
+                """, (
+                    chunk['chunk_id'],
+                    file_id,
+                    chunk['chunk_index'],
+                    chunk.get('chunk_text', ''),
+                    chunk.get('milvus_id')
+                ))
 
-                await conn.commit()
-                logger.debug(f"Added {len(chunks)} chunk records for file {file_id}")
+            await conn.commit()
+            logger.debug(f"Added {len(chunks)} chunk records for file {file_id}")
 
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Failed to add chunk metadata: {str(e)}")
                 raise
 
@@ -396,15 +396,15 @@ class FileMetadataProvider:
             List of chunk metadata dicts
         """
         conn = await self._get_connection()
-            try:
-                async with conn.execute(
-                    "SELECT * FROM chunks_metadata WHERE file_id = ? ORDER BY chunk_index",
-                    (file_id,)
-                ) as cursor:
-                    rows = await cursor.fetchall()
-                    return [dict(row) for row in rows]
+        try:
+            async with conn.execute(
+                "SELECT * FROM chunks_metadata WHERE file_id = ? ORDER BY chunk_index",
+                (file_id,)
+            ) as cursor:
+                rows = await cursor.fetchall()
+                return [dict(row) for row in rows]
 
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Failed to get file chunks: {str(e)}")
                 return []
 
@@ -424,29 +424,29 @@ class FileMetadataProvider:
             >>> print(f"Total files: {stats['total_files']}")
         """
         conn = await self._get_connection()
-            try:
-                # Total files
-                async with conn.execute("SELECT COUNT(*) FROM file_metadata") as cursor:
-                    total_files = (await cursor.fetchone())[0]
+        try:
+            # Total files
+            async with conn.execute("SELECT COUNT(*) FROM file_metadata") as cursor:
+                total_files = (await cursor.fetchone())[0]
 
-                # Total chunks
-                async with conn.execute("SELECT COUNT(*) FROM chunks_metadata") as cursor:
-                    total_chunks = (await cursor.fetchone())[0]
+            # Total chunks
+            async with conn.execute("SELECT COUNT(*) FROM chunks_metadata") as cursor:
+                total_chunks = (await cursor.fetchone())[0]
 
-                # Total file size
-                async with conn.execute("SELECT SUM(file_size) FROM file_metadata") as cursor:
-                    total_size = (await cursor.fetchone())[0] or 0
+            # Total file size
+            async with conn.execute("SELECT SUM(file_size) FROM file_metadata") as cursor:
+                total_size = (await cursor.fetchone())[0] or 0
 
-                stats = {
-                    "total_files": total_files,
-                    "total_chunks": total_chunks,
-                    "total_size_bytes": total_size,
-                    "total_size_mb": round(total_size / (1024 * 1024), 2)
-                }
+            stats = {
+                "total_files": total_files,
+                "total_chunks": total_chunks,
+                "total_size_bytes": total_size,
+                "total_size_mb": round(total_size / (1024 * 1024), 2)
+            }
 
-                return stats
+            return stats
 
-            except Exception as e:
+        except Exception as e:
                 logger.error(f"Failed to get database stats: {str(e)}")
                 return {}
 

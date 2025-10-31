@@ -1,3 +1,4 @@
+# app/api/v1/endpoints/upload.py
 """
 Upload API Endpoint
 
@@ -40,32 +41,34 @@ router = APIRouter(prefix="/upload", tags=["upload"])
 # Helper Functions
 # =============================================================================
 
-def save_uploaded_file(upload_file: UploadFile, file_id: str) -> Path:
+def save_uploaded_file(file_content: bytes, filename: str, file_id: str) -> Path:
     """
-    Save uploaded file to disk
+    Save uploaded file content to disk
 
     Args:
-        upload_file: FastAPI UploadFile object
+        file_content: Binary file content
+        filename: Original filename (for extension extraction)
         file_id: Generated file identifier
 
     Returns:
         Path to saved file
 
     Example:
-        >>> file_path = save_uploaded_file(upload_file, "file_abc123")
+        >>> file_path = save_uploaded_file(content, "doc.pdf", "file_abc123")
     """
     # Ensure upload directory exists
     upload_dir = Path(settings.PDF_UPLOAD_DIR)
     upload_dir.mkdir(parents=True, exist_ok=True)
 
     # Save with file_id as filename
-    file_extension = Path(upload_file.filename).suffix
+    file_extension = Path(filename).suffix
     file_path = upload_dir / f"{file_id}{file_extension}"
 
+    # Write binary content directly
     with file_path.open("wb") as buffer:
-        shutil.copyfileobj(upload_file.file, buffer)
+        buffer.write(file_content)
 
-    logger.info(f"Saved uploaded file: {file_path}")
+    logger.info(f"Saved uploaded file: {file_path} ({len(file_content)} bytes)")
     return file_path
 
 
@@ -268,8 +271,8 @@ async def upload_pdf(
             embedding_provider=embedding_provider
         )
 
-        # Save file to disk (background task)
-        file_path = save_uploaded_file(file, result["file_id"])
+        # Save file to disk using the already-read content
+        file_path = save_uploaded_file(file_content, file.filename, result["file_id"])
 
         logger.info(
             f"File upload completed: {result['file_id']} "

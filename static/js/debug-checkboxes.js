@@ -1,3 +1,4 @@
+// static/js/debug-checkboxes.js
 /**
  * Debug Script for Checkbox Issue
  *

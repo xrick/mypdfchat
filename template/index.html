@@ -242,83 +242,141 @@
             padding: 2rem;
         }
 
-        /* 5. 上傳模態框 (Modal) - 實現您的極簡設計 */
+        /* 5. 上傳模態框 (Modal) - 專業清晰設計 */
         .upload-modal {
             border: none;
             border-radius: 12px;
-            padding: 2rem;
+            padding: 2.5rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
+            max-width: 580px;
             width: 90%;
+            /* 確保對話框完美置中 */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0;
         }
-        .upload-modal h2 {
+
+        /* 模態框標題區 */
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .modal-header i {
             font-size: 1.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 1.5rem;
+            color: var(--color-text-primary);
         }
+        .modal-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin: 0;
+        }
+
+        /* 模態框副標題 */
+        .modal-subtitle {
+            font-size: 0.95rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 2rem;
+            padding-left: 2.25rem; /* 對齊標題文字 */
+        }
+
         /* 隱藏原生檔案輸入 */
         .upload-modal input[type="file"] {
             display: none;
         }
+
         /* 拖放區域 */
         .upload-area {
-            border: 2px dashed var(--color-border);
+            border: 2px dashed #d0d0d0;
             border-radius: 8px;
-            padding: 3rem;
+            padding: 3rem 2rem;
             text-align: center;
-            background-color: var(--color-bg-light);
+            background-color: #fafafa;
             cursor: pointer;
             transition: border-color 0.2s ease, background-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
         }
         .upload-area:hover {
             border-color: var(--color-primary);
             background-color: var(--color-white);
         }
-        .upload-area i {
-            font-size: 2.5rem;
-            color: var(--color-primary);
-            margin-bottom: 1rem;
+
+        .upload-area-text {
+            font-size: 0.95rem;
+            color: #8a8a8a;
+            font-weight: 400;
         }
-        .upload-area p {
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--color-text-primary);
-        }
-        .upload-area span {
+
+        .upload-area-divider {
             font-size: 0.875rem;
-            color: var(--color-text-secondary);
+            color: #b0b0b0;
+            margin: 0.25rem 0;
+        }
+
+        /* 瀏覽按鈕 */
+        .browse-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--color-white);
+            color: var(--color-text-primary);
+            border: 1.5px solid #d0d0d0;
+            border-radius: 6px;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .browse-btn:hover {
+            border-color: var(--color-text-primary);
+            background-color: #f5f5f5;
+        }
+        .browse-btn i {
+            font-size: 1rem;
         }
 
         .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 0.75rem;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #f0f0f0;
         }
         .modal-actions button {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 500;
-            padding: 0.6rem 1.25rem;
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
+            padding: 0.65rem 1.75rem;
+            border: none;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .modal-actions .btn-secondary {
-            background: var(--color-white);
+            background: #f5f5f5;
             color: var(--color-text-primary);
+            border: 1px solid #e0e0e0;
         }
         .modal-actions .btn-secondary:hover {
-            background: var(--color-bg-light);
+            background: #e8e8e8;
+            border-color: #d0d0d0;
         }
         .modal-actions .btn-primary {
-            background: var(--color-primary);
+            background: var(--color-text-primary);
             color: var(--color-white);
-            border-color: var(--color-primary);
         }
         .modal-actions .btn-primary:hover {
-            background: #005bb5;
+            background: #000000;
         }
 
         /* 模態框背景 */
@@ -385,18 +443,26 @@
     </div>
 
     <dialog id="uploadModal" class="upload-modal">
-        <h2>新增資料來源</h2>
-        
+        <div class="modal-header">
+            <i class="fa-solid fa-file-arrow-up"></i>
+            <h2>上傳文件</h2>
+        </div>
+
+        <p class="modal-subtitle">指定要上傳的 PDF 檔案</p>
+
         <input type="file" id="fileInput" multiple>
-        
+
         <label for="fileInput" class="upload-area" id="uploadArea">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <p>拖放檔案於此</p>
-            <span>或點擊瀏覽檔案</span>
+            <span class="upload-area-text">Drag & Drop File</span>
+            <span class="upload-area-divider">Or</span>
+            <div class="browse-btn">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>BROWSE</span>
+            </div>
         </label>
-        
+
         <div class="modal-actions">
-            <button id="cancelUploadBtn" class="btn-secondary">取消</button>
+            <button id="cancelUploadBtn" class="btn-secondary">Cancel</button>
             <button id="confirmUploadBtn" class="btn-primary">上傳</button>
         </div>
     </dialog>
@@ -490,8 +556,8 @@
 
                     console.log('[DocAI Upload] Upload completed:', result);
                 } catch (error) {
-                    // 上傳失敗，顯示錯誤
-                    window.docaiClient.updateFileStatus(newItem, 'error');
+                    // 上傳失敗，移除 UI 元素並顯示錯誤
+                    newItem.remove();  // Remove the file item from sidebar on upload failure
                     console.error('Upload failed:', error);
                     // Ensure error.message is a string, not object
                     const errorMsg = typeof error === 'string' ? error : (error.message || '未知錯誤');
