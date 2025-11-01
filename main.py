@@ -66,6 +66,26 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"L Failed to initialize database: {str(e)}")
 
+
+    # Check Milvus vector database service availability
+    try:
+        from app.Providers.vector_store_provider.milvus_client import MilvusClient
+
+        logger.info(f"🔍 Checking Milvus service at {settings.MILVUS_HOST}:{settings.MILVUS_PORT}...")
+
+        milvus_client = MilvusClient()
+
+        if milvus_client.is_service_available():
+            logger.info(f"✅ Milvus vector database service is available")
+        else:
+            logger.warning(
+                f"⚠️  Milvus service is not available at {settings.MILVUS_HOST}:{settings.MILVUS_PORT}. "
+                "Vector search features may not work properly. "
+                "Please ensure Milvus is running (e.g., docker ps | grep milvus)"
+            )
+    except Exception as e:
+        logger.warning(f"⚠️  Milvus health check failed: {str(e)}")
+        logger.info("ℹ️  Application will continue, but vector search features may be limited")
     logger.info(" Application startup complete")
 
     yield  # Application runs here

@@ -184,6 +184,28 @@ else
     fi
 fi
 
+# Check Milvus vector database (if configured)
+print_step "檢查 Milvus 向量資料庫..."
+
+# Get Milvus configuration from .env
+MILVUS_HOST=$(grep "^MILVUS_HOST=" "$PROJECT_ROOT/.env" 2>/dev/null | cut -d '=' -f2 | tr -d '"' || echo "localhost")
+MILVUS_PORT=$(grep "^MILVUS_PORT=" "$PROJECT_ROOT/.env" 2>/dev/null | cut -d '=' -f2 | tr -d '"' || echo "19530")
+
+# Test Milvus connection using nc (netcat) - cross-platform tool
+if command -v nc &> /dev/null; then
+    if nc -z -w 2 "$MILVUS_HOST" "$MILVUS_PORT" 2>/dev/null; then
+        print_success "Milvus 服務運行中 ($MILVUS_HOST:$MILVUS_PORT)"
+    else
+        print_warning "Milvus 服務未運行"
+        print_info "向量搜尋功能可能無法使用"
+        print_info "請檢查 Milvus 服務: docker ps | grep milvus"
+        print_info "或執行: docker-compose up -d milvus-standalone"
+    fi
+else
+    print_info "無法檢查 Milvus 連接 (nc 命令不可用)"
+    print_info "Python 應用層會進行詳細的 Milvus 健康檢查"
+fi
+
 # ============================================
 # Port Conflict Detection
 # ============================================

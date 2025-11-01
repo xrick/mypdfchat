@@ -99,6 +99,64 @@ class MilvusClient:
             logger.error(f"Failed to connect to Milvus: {str(e)}")
             raise
 
+    def is_service_available(self) -> bool:
+        """
+        Check if Milvus service is available and responding
+
+        This method performs a lightweight health check by attempting to:
+        1. Establish a connection to the Milvus server
+        2. Retrieve server version information
+        3. Disconnect cleanly
+
+        Returns:
+            bool: True if service is reachable and responding, False otherwise
+
+        Example:
+            >>> client = MilvusClient()
+            >>> if client.is_service_available():
+            ...     print("Milvus is running")
+            ... else:
+            ...     print("Milvus is not available")
+
+        Note:
+            This method uses a separate connection alias ('health_check')
+            to avoid interfering with the main connection.
+        """
+        try:
+            # Attempt to establish a test connection with timeout
+            connections.connect(
+                alias="health_check",
+                host=self.host,
+                port=self.port,
+                timeout=5  # 5 second timeout for health check
+            )
+
+            # Verify server is responding by getting version
+            server_version = utility.get_server_version()
+            is_available = server_version is not None
+
+            # Clean up: disconnect the health check connection
+            try:
+                connections.disconnect("health_check")
+            except Exception:
+                pass  # Ignore disconnect errors
+
+            if is_available:
+                logger.info(
+                    f"Milvus service is available at {self.host}:{self.port} "
+                    f"(version: {server_version})"
+                )
+            else:
+                logger.warning(
+                    f"Milvus service at {self.host}:{self.port} is not responding properly"
+                )
+
+            return is_available
+
+        except Exception as e:
+            logger.warning(f"Milvus service health check failed: {str(e)}")
+            return False
+
     def _initialize_collection(self):
         """
         Create collection if not exists, or load existing collection

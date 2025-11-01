@@ -29,7 +29,9 @@ RULES (violating ANY invalidates your response):
 ✅ Reference specific file paths
 ✅ Provide migration strategies
 
-    [Your prompt here]
+    /sc:analyze ```text
+the start_system should add the function of checking whether the milvus service is running
+``` 
 
 FINAL REMINDER: If you suggest creating new files, explain why existing files cannot be extended. If you recommend rewrites, justify why refactoring won't work.
 🔍 STEP 2: ANALYZE CURRENT SYSTEM
